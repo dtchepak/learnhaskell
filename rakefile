@@ -1,0 +1,7 @@
+task :build do
+    sh "ghc --make -O2 -rtsopts -fforce-recomp folding.hs"
+end
+
+task :run do
+    sh "./folding 1e7 +RTS -sstderr"
+end

@@ -1,0 +1,23 @@
+./folding 1e7 +RTS -sstderr
+./folding 1e7 +RTS -sstderr 
+       6,440,968 bytes allocated in the heap
+           5,140 bytes copied during GC
+          26,672 bytes maximum residency (1 sample(s))
+          18,384 bytes maximum slop
+               1 MB total memory in use (0 MB lost due to fragmentation)
+
+  Generation 0:    12 collections,     0 parallel,  0.00s,  0.00s elapsed
+  Generation 1:     1 collections,     0 parallel,  0.00s,  0.00s elapsed
+
+  INIT  time    0.00s  (  0.00s elapsed)
+  MUT   time    0.00s  (  0.00s elapsed)
+  GC    time    0.00s  (  0.00s elapsed)
+  EXIT  time    0.00s  (  0.00s elapsed)
+  Total time    0.00s  (  0.00s elapsed)
+
+  %GC time       1.6%  (2.2% elapsed)
+
+  Alloc rate    1,337,132,655 bytes per MUT second
+
+  Productivity  84.4% of total user, 90.6% of total elapsed
+
