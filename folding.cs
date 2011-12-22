@@ -36,7 +36,7 @@ public static class Folding {
         public static readonly CList<A> Empty = new CList<A>();
 
         public static CList<A> operator +(A head, CList<A> tail) {
-            return FoldRight((a,b) => new CList<A>(a, b), new CList<A>(head,Empty), tail);
+            return new CList<A>(head, tail);
         }
     }
 
@@ -106,7 +106,7 @@ public static class Folding {
         
         // =====================
 
-        var clist = 1 + (2 + (3 + CList<int>.Empty));
+        var clist = 1 + (2 + (3 + (4 + (5 + (6 + (7 + (8+ (9 + (10 + CList<int>.Empty)))))))));
         var result = FoldLeft((a,b) => a+b, 0, clist);
 
         Console.WriteLine(result);
