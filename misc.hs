@@ -52,4 +52,39 @@ comb (x:xs) k
         combs_of_xs = comb xs k
 
 
+cataLength = foldr f 0
+    where f a n = 1 + n
+
+cataFilter p = foldr f []
+    where f a as = if p a then (a:as) else as
+
+unfold :: (b -> Bool) -> (b -> (a,b)) -> b -> [a]
+unfold p g b = if p b then [] else a:(unfold p g b')
+    where (a, b') = g b
+
+--zip' :: [a] -> [b] -> [(a,b)]
+--zip' = unfold p g
+--    where p (as, bs) = as == [] || bs == []
+--          g ((a:as), (b:bs)) = ((a,b),(as,bs))
+
+windowed :: Int -> [a] -> [[a]]
+windowed size [] = []
+windowed size ls@(x:xs) = if length ls >= size then (take size ls) : windowed size xs else windowed size xs
+--windowed size ls@(x:xs) = (take size ls) : windowed size xs
+
+--windowed' :: Int -> [a] -> [[a]]
+--windows' size list = fst $ foldr (\h (x,y) -> 
+--windowed' size list = fst $ foldr (\h ((window,windows), acc) -> if length window == size-1 then (([], h:window ++ windows, acc) (([],[]),[]) list
+
+--windowed' :: Int -> [a] -> [[a]]
+--windowed' size list = snd $ foldr (\h (res, acc) -> if length res == size then ([], [res] ++ acc) else (h:res, acc)) ([], []) list
+--
+--
+
+
+args f defaultA defaultB (a:as) (b:bs) = f a b : args f defaultA defaultB as bs
+args f defaultA defaultB (a:as) _ = f a defaultB : args f defaultA defaultB as []
+args f defaultA defaultB _ (b:bs) = f defaultA b : args f defaultA defaultB [] bs
+args _ _ _ _ _ = []
+
 
