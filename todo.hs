@@ -16,6 +16,7 @@ main = do
 
 add :: [String] -> IO ()
 add (file:task:[]) = appendFile file (task ++ "\n")
+add _ = usage []
 
 view :: [String] -> IO ()
 view [file] = do
@@ -23,6 +24,7 @@ view [file] = do
     let tasks = lines contents
     let numberedTasks = zipWith (\n line -> show n ++ " - " ++ line) [0..] tasks
     mapM_ putStrLn numberedTasks
+view _ = usage []
 
 remove :: [String] -> IO ()
 remove _ = putStrLn "Not implemented."
