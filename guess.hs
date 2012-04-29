@@ -5,18 +5,20 @@ import Control.Monad(forever)
 
 main = forever $ do
     gen <- newStdGen
-    play . fst . randomR (1,10) $ gen
+    play 1 . fst . randomR (1,10) $ gen
 
-play :: Int -> IO ()
-play n = do
+play :: Int -> Int -> IO ()
+play guessNumber n = do
     putStrLn ""
     putStrLn "What number am I thinking of between 1 and 10?"
-    guess <- getLine
-    let result = checkGuess (readMaybe guess) n
+    result <- fmap (flip checkGuess n . readMaybe) getLine
     putStrLn (show result)
     if result == Correct 
-        then return ()
-        else play n
+        then 
+            let guessString = if guessNumber == 1 then "guess" else "guesses" 
+            in
+                putStrLn $ "It took you " ++ show guessNumber ++ " " ++ guessString ++ "."
+        else play (guessNumber+1) n
 
 data Guess = NotANumber | TooLow | TooHigh | Correct deriving (Eq)
 instance Show Guess where
