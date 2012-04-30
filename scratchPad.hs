@@ -45,4 +45,6 @@ putStr' = foldr (\x a -> (do
     )) (return ())
     
 
+gherkin :: (->) Int ((->) Int Int)
+gherkin = (+)
 
