@@ -48,3 +48,31 @@ putStr' = foldr (\x a -> (do
 gherkin :: (->) Int ((->) Int Int)
 gherkin = (+)
 
+
+addOne :: Int -> Int
+addOne a = 1+a
+
+
+
+doubleInput = do
+    input <- getLine
+    let enteredNumber = read input :: Int
+    let double = 2 * enteredNumber
+    return $ show double
+
+doubleInputWithFmap = fmap (show . (2*). read) getLine
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
