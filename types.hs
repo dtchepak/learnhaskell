@@ -61,9 +61,9 @@ instance YesNo [a] where
 instance YesNo Bool where
     yesno = id
 
-instance YesNo (Maybe Bool) where
-    yesno (Just True) = True
-    yesno _ = False
+--instance YesNo (Maybe Bool) where
+--    yesno (Just True) = True
+--    yesno _ = False
 
 instance YesNo (Maybe a) where
     yesno (Just _) = True
@@ -77,8 +77,8 @@ instance Functor Tree where
     fmap _ EmptyTree = EmptyTree
     fmap f (Node x left right) = Node (f x) (fmap f left) (fmap f right)
 
-instance Functor (Map k) where
-    fmap = map
+--instance Functor (Map k) where
+--    fmap = map
 
 
     
