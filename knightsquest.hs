@@ -30,3 +30,5 @@ steps start end = do
     guard (end == third)
     return [first, second, end]
     
+inMany :: Int -> KnightPos -> [KnightPos]
+inMany x start = return start >>= foldr (<=<) return (replicate x moveKnight)

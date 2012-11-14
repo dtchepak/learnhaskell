@@ -1,6 +1,7 @@
 import Control.Monad.Writer
 import Control.Monad.State
 import System.Random
+import Data.List (group)
 
 --
 --instance Monad Maybe where
@@ -11,7 +12,6 @@ import System.Random
 --
 type Birds = Int
 type Pole = (Birds,Birds)
-
 
 landLeft :: Birds -> Pole -> Maybe Pole
 landLeft n (left, right)
@@ -136,4 +136,42 @@ roll3 = do
     third <- randomSt' (1,6)
     return (first, second, third)
 
+
+--instance (Error e) => Monad (Either e) where
+--    return = Right
+--    (Right r) >>= f = f r
+--    (Left l) >>= _ = Left l
+--    fail msg = Left (strMsg msg)
+liftM' :: (Monad m) => (a -> b) -> m a -> m b
+liftM' f ma = ma >>= (\a -> return (f a))
+--liftM' f ma = ma >>= (return . f)
+ap' :: (Monad m) => m (a -> b) -> m a -> m b
+ap' f ma = f >>= (\f' -> 
+            ma >>= (\a ->
+            return (f' a) ))
+
+ap'' :: (Monad m) => m (a -> b) -> m a -> m b
+ap'' f ma = do
+    f' <- f
+    a <- ma
+    return $ f' a
+
+join' :: (Monad m) => m (m a) -> m a
+join' m = m >>= id
+
+data Segment x = Single x | Multiple Int x
+    deriving (Show, Eq)
+    
+encodeModified :: (Eq a) => [a] -> [Segment a]
+
+--encodeModified xs = map (\charset -> 
+--                          if ((length charset) == 1) 
+--                            then (Single (head charset)) 
+--                            else (Multiple (length charset) (head charset))) (group xs)
+
+encodeModified = map func . group
+                    where func = (\charset -> 
+                                    if ((length charset) == 1) 
+                                      then (Single (head charset))
+                                      else (Multiple (length charset) (head charset)))
 
