@@ -14,17 +14,20 @@ instance Monad (State s) where
                 in ( a',s''))
 
 
-newtype Delorean s a = Delorean { runBack :: s -> (a,s) }
+newtype Delorean s a = Delorean (State s a)
 instance Functor (Delorean s) where
-    fmap f st = Delorean (\s -> let (a',s') = runBack st s
-                                in (f a',s'))
+    fmap f (Delorean st) = Delorean . fmap f $ st
 
 instance Monad (Delorean s) where
-    return x = Delorean (\s -> (x,s))
-    st >>= f = Delorean (\s ->
-                let (a,s'') = runBack st s'
-                    (a',s') = runBack (f a) s
+    return x = Delorean (return x)
+    (Delorean st) >>= f = Delorean (State $ \s ->
+                let (a,s'') = runState st s'
+                    (Delorean st') = f a
+                    (a',s') = runState st' s
                 in (a',s'') )
+
+runBack :: Delorean s a -> s -> (a,s)
+runBack (Delorean st) = runState st
 
 newtype Stack a = Stack [a] deriving (Show, Eq)
 
@@ -40,8 +43,8 @@ pop (Stack (x:xs)) = (Just x, Stack xs)
 --
 push' a  = State (push a)
 pop'     = State (pop)
-push'' a = Delorean (push a)
-pop''    = Delorean (pop)
+push'' a = Delorean (push' a)
+pop''    = Delorean (pop')
 
 {-
 ghci> :r
