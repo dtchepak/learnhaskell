@@ -74,10 +74,6 @@ instance Functor (Consumer i) where
     fmap f (Done o) = Done (f o)
     fmap f (Consume c) = Consume $ \ma -> fmap f (c ma)
 
-joinConsumer :: Consumer i (Consumer i o) -> Consumer i o
-joinConsumer (Done c) = c
-joinConsumer (Consume c) = Consume $ \mi -> join (c mi)
-
 instance Applicative (Consumer i) where
     f <*> a = f >>= \f' -> fmap f' a
     pure = return
