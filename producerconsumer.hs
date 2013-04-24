@@ -6,25 +6,13 @@ import Debug.Trace
 data Producer a = EndStream
                 | Next a (Producer a)
 
+instance Functor Producer where
+    fmap f EndStream = EndStream
+    fmap f (Next a p) = Next (f a) (fmap f p)
 
 produce :: [a] -> Producer a
 produce [] = EndStream
 produce (a:as) = Next a (produce as)
-
---consume :: Producer a -> (a -> b) -> [b]
---consume EndStream _ = []
---consume (Next a p) f = (f a):consume p f
---
---consumeWhile :: (a -> Bool) -> Producer a -> [a]
---consumeWhile _ EndStream = []
---consumeWhile pred (Next a p) = if pred a then a:consumeWhile pred p
---                               else []
---
---consume' :: Producer a -> (b -> a -> b) -> b -> b
---consume' EndStream _ b = b
---consume' (Next a p) f b = 
---    let b' = f b a
---    in b' `seq` consume' p f b'
 
 consume :: Producer a -> (b -> a -> Maybe b) -> b -> b
 consume EndStream _ b = b
@@ -57,10 +45,17 @@ sumC =
     let loop i = Consume $ maybe (Done i) (loop . (i+)) 
     in loop 0
 
+countI :: Consumer a Integer
+countI = 
+  let loop :: Integer -> Consumer a Integer
+      loop acc = Consume $ maybe (Done acc) (const . loop . succ $ acc)
+  in loop 0
+
 adapt :: Consumer i o -> Consumer o o' -> Consumer i o'
 adapt _ (Done o') = Done o'
 adapt (Done o) (Consume c) = adapt (Done o) (Consume (const (c Nothing)))
 adapt (Consume c) c' = Consume $ \mi -> adapt (c mi) c' -- <--- rong
+
 
 getLineC :: Consumer Char String
 getLineC =
@@ -96,14 +91,11 @@ getLinesC =
     in loop []
 
 
---sumUntilOdd' :: Consumer Integer Integer
---sumUntilOdd' = 
---blarg :: Producer Integer -> Consumer Integer Integer
---blarg EndStream =
-
---transform :: Producer i -> Consumer i o -> Producer o
---transform _ (Done o) = Next o EndStream
---transform EndStream (Consume c) = EndStream
+toListC :: Consumer a [a]
+toListC = 
+    let loop :: [a] -> Consumer a [a]
+        loop acc = Consume $ maybe (Done . reverse $ acc) (\x -> loop (x:acc))
+    in loop []
 
 tp x = trace (show x) x
 sampleNum = produce [tp 2, tp 4, tp 6, tp 7, tp 8, tp 9]
