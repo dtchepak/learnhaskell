@@ -2,6 +2,7 @@ import Data.Char
 import Data.List
 import Data.Maybe
 import Data.Monoid
+import Data.Traversable (traverse)
 
 data ProgrammingLanguage 
     = CSharp
@@ -35,10 +36,10 @@ reportColumns =
 
 surveyToCsv :: [SurveyResponse] -> String
 surveyToCsv =
-    let joinOn s = mconcat . intersperse s
+    let joinOn   = intercalate
         toCsv    = joinOn ","
         headers  = toCsv $ fmap fst reportColumns
-        values   = toCsv . sequence (fmap snd reportColumns)
+        values   = toCsv . traverse snd reportColumns
     in
         joinOn "\n" . (headers:) . fmap values
 
