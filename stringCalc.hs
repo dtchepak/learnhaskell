@@ -1,5 +1,6 @@
 import Data.Char
 import Data.Maybe
+import Control.Monad
 
 newline      = is '\n'
 comma        = is ','
@@ -14,11 +15,22 @@ customDelim  = do
 stringCalcP :: Parser [Int]
 stringCalcP = do
     delim <- customDelim ||| return defaultDelim
-    empty ||| sepBy delim positive
+    empty ||| (positive `sepBy` delim)
 
 stringCalc :: String -> Maybe Int
 stringCalc = 
     fmap sum . parseAll stringCalcP
+
+{-
+ghci> filterM' (\x -> if x > 5 then return True else if x > 2 then return False else Nothing) [0..8]
+Nothing
+ghci> let xyz = filterM (\a -> if a>100 then failP else if even a then return True else return False)
+ghci> let csv = sepByChar ',' positive
+ghci> (csv >>= xyz) `parse` "1,2,3,4,5,102,4"
+Nothing
+ghci> (csv >>= xyz) `parse` "1,2,3,4,5,4"
+Just ("",[2,4,4])
+ -}
 
 ----------------------
 -- Parser stuff
@@ -62,24 +74,30 @@ atLeast1 p = p >>= \a -> fmap (a:) (many p)
 many :: Parser a -> Parser [a]
 many p = atLeast1 p ||| constP []
 
-positive:: Parser Int
+positive :: Parser Int
 positive = fmap read (atLeast1 (match isDigit))
+
+negative :: Parser Int
+negative = is '-' >> fmap negate positive
+
+number :: Parser Int
+number = negative ||| positive
 
 empty :: Parser [a]
 empty = P $ \i -> case i of
                     [] -> Just (i, [])
                     _  -> Nothing
 
-sepBy :: Parser s -> Parser a -> Parser [a]
-sepBy s p = 
+sepBy :: Parser a -> Parser s -> Parser [a]
+sepBy p s = 
     let sepAndOne = s >> p
     in do
         first <- p
         rest <- many sepAndOne
         return $ first:rest
 
-sepByChar :: Char -> Parser a -> Parser [a]
-sepByChar = sepBy . is
+sepByChar :: Parser a -> Char -> Parser [a]
+sepByChar p = sepBy p . is
 
 parseAll :: Parser a -> String -> Maybe a
 parseAll p s = case parse p s of

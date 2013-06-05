@@ -28,6 +28,24 @@ eval _ (Done x) = x
 eval EndStream (Consume c) = eval EndStream (c Nothing)
 eval (Next a p) (Consume c) = eval p (c (Just a))
 
+-- refactor eval into consumption bits and production bits
+-- (from: http://okmij.org/ftp/Haskell/Iteratee/IterDeriv.hs)
+endC :: Consumer a o -> o           -- No more input, so extract value
+endC (Done o) = o                   -- if already done, get that value
+--endC (Consume c) = endC (c Nothing) -- no more input, so pass Nothing to consume fn
+endC (Consume c) = case c Nothing of
+                    Done o -> o
+                    _      -> error "divergent consumer"
+process :: Producer a -> Consumer a o -> Consumer a o
+process EndStream c = c
+process _ (Done a) = Done a
+process (Next a p) (Consume c) = process p (c (Just a))
+
+eval' :: Producer a -> Consumer a o -> o
+eval' p = endC . process p
+-- --------------
+
+
 sumUntilOdd :: Consumer Integer Integer
 sumUntilOdd = 
     let loop i = Consume $ maybe (Done i) (\x -> if even x then loop (x+i) else Done i)
