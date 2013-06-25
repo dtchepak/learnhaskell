@@ -1,3 +1,4 @@
+-- http://www.haskellforall.com/2013/02/you-could-have-invented-comonads.html
 type Option = String
 data Config = MakeConfig [Option] deriving (Show)
 
