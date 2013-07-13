@@ -1,10 +1,11 @@
 -- http://scottchamberlin.tumblr.com/post/55152416452/linqinterview
 -- "Return the top 10 most frequently occurring words in a string"
 {-# LANGUAGE TupleSections #-}
-
+import Control.Monad.State
 import Data.List as L
 import Data.Map as M
 import Data.Ord
+import Data.Traversable
 
 type Freq a = [(a,Int)]
 
@@ -24,6 +25,15 @@ golf = sortBy (comparing (Down . snd)) . M.toList . fromListWith (+) . fmap (,1)
 
 
 -- TODO: traverse with state monad?
+-- traverse :: => (a -> f b) -> [a] -> f [b]
+--                (a -> State s b) -> [a] -> State s [b]
+--                (a -> State s (string, int)) -> [a] -> State s [(string,int)]
+freq' :: (Ord a, Traversable t) => t a -> Freq a
+freq' = 
+    let updateState a = modify (insertWith (+) a 1)
+        run = flip execState M.empty
+    in M.toList . run . traverse updateState
+-- takes longer than freq to process sample
 
 -- SAMPLE
 sample = readFile "../davesquared.net/source/_posts/2013-03-11-reasoning-and-mutability.pandoc"
