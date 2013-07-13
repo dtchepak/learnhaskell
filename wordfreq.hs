@@ -12,6 +12,14 @@ type Freq a = [(a,Int)]
 freq :: Ord a => [a] -> Freq a
 freq = M.toList . L.foldl' (\acc x -> insertWith (+) x 1 acc) M.empty
 
+-- traverse with state monad
+-- takes longer than freq to process sample
+freq' :: (Ord a, Traversable t) => t a -> Freq a
+freq' = 
+    let updateState a = modify (insertWith (+) a 1)
+        run = flip execState M.empty
+    in M.toList . run . traverse updateState
+
 sortByFreq :: Ord a => [a] -> [a]
 sortByFreq = fmap fst . sortBy (comparing (Down . snd)) . freq
 
@@ -22,15 +30,6 @@ topN n = take n . sortByFreq . words
 -- string.split(' ').inject(Hash.new(0)) {|acc, new| acc[new]+=1; acc}.sort_by {|k,v| -v}
 
 golf = sortBy (comparing (Down . snd)) . M.toList . fromListWith (+) . fmap (,1) . words
-
-
--- traverse with state monad
-freq' :: (Ord a, Traversable t) => t a -> Freq a
-freq' = 
-    let updateState a = modify (insertWith (+) a 1)
-        run = flip execState M.empty
-    in M.toList . run . traverse updateState
--- takes longer than freq to process sample
 
 -- SAMPLE
 sample = readFile "../davesquared.net/source/_posts/2013-03-11-reasoning-and-mutability.pandoc"
