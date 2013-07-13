@@ -24,10 +24,7 @@ topN n = take n . sortByFreq . words
 golf = sortBy (comparing (Down . snd)) . M.toList . fromListWith (+) . fmap (,1) . words
 
 
--- TODO: traverse with state monad?
--- traverse :: => (a -> f b) -> [a] -> f [b]
---                (a -> State s b) -> [a] -> State s [b]
---                (a -> State s (string, int)) -> [a] -> State s [(string,int)]
+-- traverse with state monad
 freq' :: (Ord a, Traversable t) => t a -> Freq a
 freq' = 
     let updateState a = modify (insertWith (+) a 1)
