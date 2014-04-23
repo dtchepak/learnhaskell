@@ -30,15 +30,12 @@ Sale {customer = "Clive", items = ["Tea"], saleNum = Just 123}
 
 -- Keep track of state of Sale; thread to each
 -- State = \s -> (s,a)
-(~~) :: (a -> s -> s) -> a -> State s s
-f ~~ a = state (\s -> let x = f a s in (x, x))
-
 doSale'' :: Customer -> [Item] -> Int -> Sale -> Sale
 doSale'' c i n = 
     let update = do
-          addCustomer ~~ c
-          addItems ~~ i
-          complete ~~ n
+          modify $ addCustomer c
+          modify $ addItems i
+          modify $ complete n
     in execState update
 -- Lenses
 customerL = lens customer (\x c -> x { customer = c })
