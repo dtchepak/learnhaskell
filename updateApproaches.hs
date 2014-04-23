@@ -11,7 +11,9 @@ data Sale = Sale { customer :: Customer, items :: [Item], saleNum :: Maybe Int }
 empty :: Sale
 empty = Sale "" [] Nothing
 
+--------------------------------------------------
 -- Compose functions Sale -> Sale
+--------------------------------------------------
 addCustomer :: Customer -> Sale -> Sale
 addCustomer c s = s { customer = c }
 addItems :: [Item] -> Sale -> Sale
@@ -19,8 +21,10 @@ addItems i s = s { items = i }
 complete :: Int -> Sale -> Sale
 complete i s = s { saleNum = Just i }
 
+-- right-to-left
 doSale :: Customer -> [Item] -> Int -> Sale -> Sale
 doSale c i n = complete n . addItems i . addCustomer c
+-- left-to-right
 doSale' :: Customer -> [Item] -> Int -> Sale -> Sale
 doSale' c i n = addCustomer c >>> addItems i >>> complete n
 {-
@@ -28,13 +32,15 @@ ghci> (addCustomer "Clive" >>> addItems ["Tea"] >>> complete 123) empty
 Sale {customer = "Clive", items = ["Tea"], saleNum = Just 123}
 -}
 
+-- compose lists of functions
 doSale''' :: Customer -> [Item] -> Int -> Sale -> Sale
 doSale''' c i n = 
     foldr (>>>) id [addCustomer c, addItems i, complete n]
 -- Or use Endo: http://davesquared.net/2012/07/composition-via-scary-sounding-maths-terms.html
 
+--------------------------------------------------
 -- Keep track of state of Sale; thread to each
--- State = \s -> (s,a)
+--------------------------------------------------
 doSale'' :: Customer -> [Item] -> Int -> Sale -> Sale
 doSale'' c i n = 
     execState $ do
@@ -42,7 +48,9 @@ doSale'' c i n =
       modify $ addItems i
       modify $ complete n
 
+--------------------------------------------------
 -- Lens and state
+--------------------------------------------------
 -- (can generate lenses for each field automatically if we like)
 customerL = lens customer (\x c -> x { customer = c })
 itemsL = lens items (\x i -> x { items = i })
