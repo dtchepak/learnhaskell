@@ -28,6 +28,11 @@ ghci> (addCustomer "Clive" >>> addItems ["Tea"] >>> complete 123) empty
 Sale {customer = "Clive", items = ["Tea"], saleNum = Just 123}
 -}
 
+doSale''' :: Customer -> [Item] -> Int -> Sale -> Sale
+doSale''' c i n = 
+    foldr (>>>) id [addCustomer c, addItems i, complete n]
+-- Or use Endo: http://davesquared.net/2012/07/composition-via-scary-sounding-maths-terms.html
+
 -- Keep track of state of Sale; thread to each
 -- State = \s -> (s,a)
 doSale'' :: Customer -> [Item] -> Int -> Sale -> Sale
@@ -37,6 +42,7 @@ doSale'' c i n =
           modify $ addItems i
           modify $ complete n
     in execState update
+
 -- Lenses
 customerL = lens customer (\x c -> x { customer = c })
 itemsL = lens items (\x i -> x { items = i })
