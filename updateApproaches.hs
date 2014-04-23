@@ -44,6 +44,7 @@ doSale'' c i n =
     in execState update
 
 -- Lens and state
+-- (can generate lenses for each field automatically if we like)
 customerL = lens customer (\x c -> x { customer = c })
 itemsL = lens items (\x i -> x { items = i })
 saleNumL = sets (\u s -> s { saleNum = Just (u s) })
