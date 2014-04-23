@@ -37,11 +37,10 @@ doSale''' c i n =
 -- State = \s -> (s,a)
 doSale'' :: Customer -> [Item] -> Int -> Sale -> Sale
 doSale'' c i n = 
-    let update = do
-          modify $ addCustomer c
-          modify $ addItems i
-          modify $ complete n
-    in execState update
+    execState $ do
+      modify $ addCustomer c
+      modify $ addItems i
+      modify $ complete n
 
 -- Lens and state
 -- (can generate lenses for each field automatically if we like)
@@ -51,9 +50,8 @@ saleNumL = sets (\u s -> s { saleNum = Just (u s) })
 
 doSaleL :: Customer -> [Item] -> Int -> Sale -> Sale
 doSaleL c i n =
-    let update = do
+    execState $ do
         customerL .= c
         itemsL .= i
         saleNumL .= n
-    in execState update
 
