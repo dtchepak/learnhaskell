@@ -43,14 +43,16 @@ doSale'' c i n =
           modify $ complete n
     in execState update
 
--- Lenses
+-- Lens and state
 customerL = lens customer (\x c -> x { customer = c })
 itemsL = lens items (\x i -> x { items = i })
 saleNumL = sets (\u s -> s { saleNum = Just (u s) })
 
 doSaleL :: Customer -> [Item] -> Int -> Sale -> Sale
-doSaleL c i n = do
-    customerL .~ c
-    itemsL .~ i
-    saleNumL .~ n
+doSaleL c i n =
+    let update = do
+        customerL .= c
+        itemsL .= i
+        saleNumL .= n
+    in execState update
 
