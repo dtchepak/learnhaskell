@@ -63,3 +63,5 @@ doSaleL c i n =
         itemsL .= i
         saleNumL .= n
 
+doSaleL' :: Customer -> [Item] -> Int -> Sale -> Sale
+doSaleL' c i n = customerL .~ c >>> itemsL .~ i >>> saleNumL .~ n
