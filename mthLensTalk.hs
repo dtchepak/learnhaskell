@@ -32,3 +32,6 @@ Identity (Person {_name = "DAVE"})
 ghci> runIdentity $ name (Identity . map toUpper) dave
 Person {_name = "DAVE"}
 -}
+
+modify :: Lens' a b -> (b -> b) -> a -> a
+modify l m = runIdentity . l (Identity . m)
