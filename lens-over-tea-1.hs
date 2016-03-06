@@ -68,6 +68,11 @@ view :: Lens s t a b -> s -> a
 view l =
     getConst . l Const
 
+over :: Lens s t a b -> (a->b) -> s -> t
+over l f =
+    runIdentity . l (Identity . f)
+
+
 -- Modify the target of a lens, but return the old value.
 (<<%~) :: Lens s t a b -> (a -> b) -> s -> (a, t)
 (<<%~) l f =
