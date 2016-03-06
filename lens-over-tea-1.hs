@@ -72,6 +72,9 @@ over :: Lens s t a b -> (a->b) -> s -> t
 over l f =
     runIdentity . l (Identity . f)
 
+set :: Lens' s a -> a -> s -> s
+set l =
+    over l . const
 
 -- Modify the target of a lens, but return the old value.
 (<<%~) :: Lens s t a b -> (a -> b) -> s -> (a, t)
